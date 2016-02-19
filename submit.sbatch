@@ -3,7 +3,7 @@
 #SBATCH --job-name=3dI
 #SBATCH --output=sme.out
 #SBATCH --error=sme.err
-#SBATCH --time=2:00:00
+#SBATCH --time=10:00:00
 #SBATCH --qos=iric
 #SBATCH --mem=60000
 #SBATCH --partition=iric
