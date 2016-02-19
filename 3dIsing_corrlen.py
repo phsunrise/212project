@@ -7,8 +7,8 @@ from metropolis import metropolis_3dI
 size_1d = 32
 size = [size_1d, size_1d, size_1d]
 Ns = np.prod(size) # number of sites
-Kstart = 3
-Kend = 3
+Kstart = 0.3
+Kend = 0.3
 Ksteps = 1
 K_array = np.linspace(Kstart, Kend, Ksteps, endpoint=False)
 
