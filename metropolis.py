@@ -203,56 +203,105 @@ def metropolis_4dLGT(lt, K, N=2):
         # wy plane: +(i,j,k,l,3) +(i,j,k,lp1,1) -(i,jp1,k,l,3) -(i,j,k,l,1)
         # zw plane: +(i,j,k,l,2) +(i,j,kp1,l,3) -(i,j,k,wp1,2) -(i,j,k,l,3)
         if d == 0:
-            H_old = (Re[(+ lt[i,j,k,l,0]     - lt[i,j,k,l,1] 
-                         + lt[ip1,j,k,l,1]   - lt[i,jp1,k,l,0]) % N]
-                    +Re[(+ lt[i,j,k,l,2]     - lt[i,j,k,l,0]    
+            H_old = (Re[(+ lt[i,j,k,l,0]     - lt[i,j,k,l,1]          # xy
+                         + lt[ip1,j,k,l,1]   - lt[i,jp1,k,l,0]) % N]  
+                    +Re[(+ lt[i,j,k,l,2]     - lt[i,j,k,l,0]          # zx
                          + lt[i,j,kp1,l,0]   - lt[ip1,j,k,l,2]) % N]
+                    +Re[(+ lt[i,j,k,l,0]     - lt[i,j,k,l,3]          # xw
+                         + lt[ip1,j,k,l,3]   - lt[i,j,k,lp1,0]) % N]
                     +Re[(+ lt[i,jm1,k,l,0]   - lt[i,jm1,k,l,1] 
                          + lt[ip1,jm1,k,l,1] - lt[i,j,k,l,0])   % N]
                     +Re[(+ lt[i,j,km1,l,2]   - lt[i,j,km1,l,0]   
-                         + lt[i,j,k,l,0]     - lt[ip1,j,km1,l,2]) % N]) * K
+                         + lt[i,j,k,l,0]     - lt[ip1,j,km1,l,2]) % N]
+                    +Re[(+ lt[i,j,k,lm1,0]   - lt[i,j,k,lm1,3] 
+                         + lt[ip1,j,k,lm1,3] - lt[i,j,k,l,0])   % N]) * K
             H_new = (Re[(+ new               - lt[i,j,k,l,1] 
                          + lt[ip1,j,k,l,1]   - lt[i,jp1,k,l,0]) % N]
                     +Re[(+ lt[i,j,k,l,2]     - new   
                          + lt[i,j,kp1,l,0]   - lt[ip1,j,k,l,2]) % N]
+                    +Re[(+ new               - lt[i,j,k,l,3]          # xw
+                         + lt[ip1,j,k,l,3]   - lt[i,j,k,lp1,0]) % N]
                     +Re[(+ lt[i,jm1,k,l,0]   - lt[i,jm1,k,l,1] 
                          + lt[ip1,jm1,k,l,1] - new          ) % N]
                     +Re[(+ lt[i,j,km1,l,2]   - lt[i,j,km1,l,0]   
-                         + new               - lt[ip1,j,km1,l,2]) % N]) * K
+                         + new               - lt[ip1,j,km1,l,2]) % N])
+                    +Re[(+ lt[i,j,k,lm1,0]   - lt[i,j,k,lm1,3] 
+                         + lt[ip1,j,k,lm1,3] - new          ) % N]) * K
         elif d == 1:
-            H_old = (Re[(+ lt[i,j,k,l,1]     - lt[i,j,k,l,2] 
+            H_old = (Re[(+ lt[i,j,k,l,1]     - lt[i,j,k,l,2]         # yz 
                          + lt[i,jp1,k,l,2]   - lt[i,j,kp1,l,1]) % N]
-                    +Re[(+ lt[i,j,k,l,0]     - lt[i,j,k,l,1]    
+                    +Re[(+ lt[i,j,k,l,0]     - lt[i,j,k,l,1]         # xy
                          + lt[ip1,j,k,l,1]   - lt[i,jp1,k,l,0]) % N]
+                    +Re[(+ lt[i,j,k,l,3]     - lt[i,j,k,l,1]         # wy
+                         + lt[i,j,k,lp1,1]   - lt[i,jp1,k,l,3]) % N]
                     +Re[(+ lt[i,j,km1,l,0]   - lt[i,j,km1,l,2] 
                          + lt[i,jp1,km1,l,2] - lt[i,j,k,l,1])   % N]
                     +Re[(+ lt[im1,j,k,l,0]   - lt[im1,j,k,l,1]   
-                         + lt[i,j,k,l,1]     - lt[im1,jp1,k,l,0]) % N]) * K
+                         + lt[i,j,k,l,1]     - lt[im1,jp1,k,l,0]) % N]
+                    +Re[(+ lt[i,j,k,lm1,3]   - lt[i,j,k,lm1,1]       # wy
+                         + lt[i,j,k,l,1]     - lt[i,jp1,k,lm1,3]) % N]) * K
             H_new = (Re[(+ new               - lt[i,j,k,l,2] 
                          + lt[i,jp1,k,l,2]   - lt[i,j,kp1,l,1]) % N]
                     +Re[(+ lt[i,j,k,l,0]     - new    
                          + lt[ip1,j,k,l,1]   - lt[i,jp1,k,l,0]) % N]
+                    +Re[(+ lt[i,j,k,l,3]     - new                   # wy
+                         + lt[i,j,k,lp1,1]   - lt[i,jp1,k,l,3]) % N]
                     +Re[(+ lt[i,j,km1,l,0]   - lt[i,j,km1,l,2] 
                          + lt[i,jp1,km1,l,2] - new        )   % N]
                     +Re[(+ lt[im1,j,k,l,0]   - lt[im1,j,k,l,1]   
-                         + new               - lt[im1,jp1,k,l,0]) % N]) * K
+                         + new               - lt[im1,jp1,k,l,0]) % N])
+                    +Re[(+ lt[i,j,k,lm1,3]   - lt[i,j,k,lm1,1]       # wy
+                         + new               - lt[i,jp1,k,lm1,3]) % N]) * K
         elif d == 2:
-            H_old = (Re[(+ lt[i,j,k,l,2]     - lt[i,j,k,l,0] 
+            H_old = (Re[(+ lt[i,j,k,l,2]     - lt[i,j,k,l,0]         # zx 
                          + lt[i,j,kp1,l,0]   - lt[ip1,j,k,l,2]) % N]
-                    +Re[(+ lt[i,j,k,l,1]     - lt[i,j,k,l,2]    
+                    +Re[(+ lt[i,j,k,l,1]     - lt[i,j,k,l,2]         # yz
                          + lt[i,jp1,k,l,2]   - lt[i,j,kp1,l,1]) % N]
+                    +Re[(+ lt[i,j,k,l,2]     - lt[i,j,k,l,3]         # zw 
+                         + lt[i,j,kp1,l,3]   - lt[i,j,k,lp1,2]) % N]
                     +Re[(+ lt[im1,j,k,l,2]   - lt[im1,j,k,l,0] 
                          + lt[im1,j,kp1,l,0] - lt[i,j,k,l,2])   % N]
                     +Re[(+ lt[i,jm1,k,l,1]   - lt[i,jm1,k,l,2]   
-                         + lt[i,j,k,l,2]     - lt[i,jm1,kp1,l,1]) % N]) * K
+                         + lt[i,j,k,l,2]     - lt[i,jm1,kp1,l,1]) % N]
+                    +Re[(+ lt[i,j,k,lm1,2]   - lt[i,j,k,lm1,3]       # zw 
+                         + lt[i,j,kp1,lm1,3] - lt[i,j,k,l,2]) % N]) * K
             H_new = (Re[(+ new               - lt[i,j,k,l,0] 
                          + lt[i,j,kp1,l,0]   - lt[ip1,j,k,l,2]) % N]
                     +Re[(+ lt[i,j,k,l,1]     - new    
                          + lt[i,jp1,k,l,2]   - lt[i,j,kp1,l,1]) % N]
+                    +Re[(+ new               - lt[i,j,k,l,3]         # zw 
+                         + lt[i,j,kp1,l,3]   - lt[i,j,k,lp1,2]) % N]
                     +Re[(+ lt[im1,j,k,l,2]   - lt[im1,j,k,l,0] 
-                         + lt[im1,j,kp1,l,0] - new        )   % N]
+                         + lt[im1,j,kp1,l,0] - new            ) % N]
                     +Re[(+ lt[i,jm1,k,l,1]   - lt[i,jm1,k,l,2]   
-                         + new               - lt[i,jm1,kp1,l,1]) % N]) * K
+                         + new               - lt[i,jm1,kp1,l,1]) % N]
+                    +Re[(+ lt[i,j,k,lm1,2]   - lt[i,j,k,lm1,3]       # zw 
+                         + lt[i,j,kp1,lm1,3] - new            ) % N]) * K
+         elif d == 3:
+            H_old = (Re[(+ lt[i,j,k,l,0]     - lt[i,j,k,l,3]         # xw
+                         + lt[ip1,j,k,l,3]   - lt[i,j,k,lp1,0]) % N]
+                    +Re[(+ lt[i,j,k,l,3]     - lt[i,j,k,l,1]         # wy
+                         + lt[i,j,k,lp1,1]   - lt[i,jp1,k,l,3]) % N]
+                    +Re[(+ lt[i,j,k,l,2]     - lt[i,j,k,l,3]         # zw 
+                         + lt[i,j,kp1,l,3]   - lt[i,j,k,lp1,2]) % N]
+                    +Re[(+ lt[im1,j,k,l,0]   - lt[im1,j,k,l,3]       # xw
+                         + lt[i,j,k,l,3]     - lt[i,j,k,l,0]) % N]
+                    +Re[(+ lt[i,jm1,k,l,3]   - lt[i,jm1,k,l,1]       # wy
+                         + lt[i,jm1,k,lp1,1] - lt[i,j,k,l,3]) % N]
+                    +Re[(+ lt[i,j,km1,l,2]   - lt[i,j,km1,l,3]       # zw 
+                         + lt[i,j,k,l,3]     - lt[i,j,km1,lp1,2]) % N]) * K
+            H_new = (Re[(+ lt[i,j,k,l,0]     - new                   # xw
+                         + lt[ip1,j,k,l,3]   - lt[i,j,k,lp1,0]) % N]
+                    +Re[(+ new               - lt[i,j,k,l,1]         # wy
+                         + lt[i,j,k,lp1,1]   - lt[i,jp1,k,l,3]) % N]
+                    +Re[(+ lt[i,j,k,l,2]     - new                   # zw 
+                         + lt[i,j,kp1,l,3]   - lt[i,j,k,lp1,2]) % N]
+                    +Re[(+ lt[im1,j,k,l,0]   - lt[im1,j,k,l,3]       # xw
+                         + new               - lt[i,j,k,l,0]) % N]
+                    +Re[(+ lt[i,jm1,k,l,3]   - lt[i,jm1,k,l,1]       # wy
+                         + lt[i,jm1,k,lp1,1] - new            ) % N]
+                    +Re[(+ lt[i,j,km1,l,2]   - lt[i,j,km1,l,3]       # zw 
+                         + new               - lt[i,j,km1,lp1,2]) % N]) * K
         
         # debugging
         if debug == True:
@@ -262,9 +311,9 @@ def metropolis_4dLGT(lt, K, N=2):
 
         # accept or decline
         if H_new >= H_old:
-            lt[i,j,k,d] = new 
+            lt[i,j,k,l,d] = new 
         else:
             rand = np.random.rand()
             if rand < np.exp(H_new - H_old):
-                lt[i,j,k,d] = new
-# END 3d LGT metropolis 
+                lt[i,j,k,l,d] = new
+# END 4d LGT metropolis 
