@@ -1,60 +1,96 @@
+import os
+import pickle
 import numpy as np
 import itertools
 import matplotlib.pyplot as plt
 from metropolis import metropolis_3dI
 
 # parameters
-size_1d = 32
+size_1d = 32 
 size = [size_1d, size_1d, size_1d]
 Ns = np.prod(size) # number of sites
-Kstart = 0.
-Kend = 2.
-Ksteps = 1000
-K_array = np.append(np.linspace(Kstart, Kend, Ksteps, endpoint=False),\
-                    np.linspace(Kend, Kstart, Ksteps, endpoint=False))
+T_array = np.arange(4.32, 4.7, 0.02)
+
+Ninit = 100 # in units of monte carlo per spin
+Ncycles = 1000 
+Nsteps = 1 # monte carlo per spin for each cycle
+
+
+# file header
+header = {'model':'3D Ising', 'size':size, 'T':None, \
+          'Ninit':Ninit, 'Ncycles':Ncycles, 'Nsteps':Nsteps}
 
 # initialize lattice
 lt = np.zeros(size)
 for s in np.nditer(lt, op_flags=['readwrite']):
-    rand = np.random.rand()
-    if rand < 0.5:
-        s[...] = -1
-    else:
-        s[...] = 1
+    ## random spins
+    #rand = np.random.rand()
+    #if rand < 0.5:
+    #    s[...] = -1.
+    #else:
+    #    s[...] = 1.
+    
+    # all spins up
+    s[...] = 1.
 
 # Metropolis algorithm
-Nsteps = 100000
-U_array = [] # store internal energy
-M_array = [] # store total magnetization
+r_array = np.arange(5)
+for T in T_array:
+    K = 1./T
 
-for K in K_array:
-    U = 0 # internal energy, defined as sum of -s_i * s_j
-    #M = 0 # magnetization, defined as sum of s_i
-    for i_step in xrange(Nsteps):
+    # initialize by doing Ninit steps
+    for i_step in xrange(Ninit):
         metropolis_3dI(lt, K)
-    #END step loop
-
-    # measure physical quantities
-    for i, j, k in itertools.product(*map(xrange, size)):
-        ip1 = (i+1) % size[0]
-        jp1 = (j+1) % size[1]
-        kp1 = (k+1) % size[2]
-        U += -lt[i,j,k]*(lt[ip1,j,k]+lt[i,jp1,k]+lt[i,j,kp1])
-        #M += lt[i,j,k]
+    #END initialization
     
-    U_array.append([K, U])
-    #M_array.append(M*1.0)
+    # START cycle loop; measure physical quantity after each cycle
+    s0sr_array = np.zeros(5)
+    M = []
+    U = []
 
-#plt.figure()
-#plt.plot(U_array/Ns)
-#plt.savefig("InternalEnergy.png")
+    for i_cycle in xrange(Ncycles):
+        for i_step in xrange(Nsteps):
+            metropolis_3dI(lt, K) 
+        #END step loop
 
-#plt.figure()
-#plt.plot(M_array/Ns)
-#plt.savefig("Magnetization.png")
+        # measure physical quantities for this cycle
+        M.append(np.sum(lt)*1.)
+        s0 = np.sum(lt)*1. / Ns # average spin, only
+        for i_r in xrange(len(r_array)):
+            r = r_array[i_r]
+            # measure <s0*sr>
+            s0sr = 0.
+            for i, j, k in itertools.product(*map(xrange, size)):
+                ipr = (i+r) % size[0]
+                jpr = (j+r) % size[1]
+                kpr = (k+r) % size[2]
+                s0sr += lt[i,j,k]*(lt[ipr,j,k]+lt[i,jpr,k]+lt[i,j,kpr])
+            if r == 1:
+                U.append(-s0sr*1.) # internal energy is defined as sum of
+                                   # s_i*s_j for nn
 
-plt.figure()
-U_array = np.array(U_array)
-plt.plot(U_array[:,0], U_array[:,1])
-plt.savefig("thermalcycle_%d_lattice.png" % size_1d)
-np.savez("thermalcycle_%d_lattice.npz" % size_1d, U=U_array)
+            s0sr /= Ns * 3. # 3 pairs for each site
+            
+            #print "<s0sr> =", s0sr, "<s0> =", s0
+            s0sr_array[i_r] = s0sr_array[i_r] + s0sr - s0**2
+            #print "s0sr:", s0sr_array
+
+    #print zip(r_array, s0sr_array)
+    s0sr_array = s0sr_array / (Ncycles * 1.)
+    s0 = np.mean(M)*1./Ns
+
+    #plt.figure()
+    #plt.plot(r_array, -np.log(abs(s0sr_array)))
+    #plt.xlabel("r")
+    #plt.ylabel(r"$-\ln(<\sigma_0\sigma_r>-<s_0><s_r>)$")
+    #plt.savefig("corrlen_K_%.2f.png" % K)
+
+
+    # saving data to file
+    os.chdir("/home/phsun/212project/3dIsing/%d" % size_1d)
+    f = open("T_%.2f.pickle" % T, 'w')
+    header['T'] = T
+    pickle.dump({'header':header, 'M':M, 'M_ave':np.mean(M),\
+                 'U':U, 'U_ave':np.mean(U), 's0':s0, \
+                 'r':r_array, 's0sr':s0sr_array}, f)
+    f.close() 
