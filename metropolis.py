@@ -1,5 +1,6 @@
 import numpy as np
 
+#debug = True
 debug = False 
 
 # do metropolis algorithm for 1 MC per spin
@@ -104,7 +105,7 @@ def metropolis_3dLGT(lt, K, N=2):
                          + lt[i,jp1,k,2]   - lt[i,j,kp1,1]) % N]
                     +Re[(+ lt[i,j,k,0]     - lt[i,j,k,1]    
                          + lt[ip1,j,k,1]   - lt[i,jp1,k,0]) % N]
-                    +Re[(+ lt[i,j,km1,0]   - lt[i,j,km1,2] 
+                    +Re[(+ lt[i,j,km1,1]   - lt[i,j,km1,2] 
                          + lt[i,jp1,km1,2] - lt[i,j,k,1])   % N]
                     +Re[(+ lt[im1,j,k,0]   - lt[im1,j,k,1]   
                          + lt[i,j,k,1]     - lt[im1,jp1,k,0]) % N]) * K
@@ -112,7 +113,7 @@ def metropolis_3dLGT(lt, K, N=2):
                          + lt[i,jp1,k,2]   - lt[i,j,kp1,1]) % N]
                     +Re[(+ lt[i,j,k,0]     - new    
                          + lt[ip1,j,k,1]   - lt[i,jp1,k,0]) % N]
-                    +Re[(+ lt[i,j,km1,0]   - lt[i,j,km1,2] 
+                    +Re[(+ lt[i,j,km1,1]   - lt[i,j,km1,2] 
                          + lt[i,jp1,km1,2] - new        )   % N]
                     +Re[(+ lt[im1,j,k,0]   - lt[im1,j,k,1]   
                          + new             - lt[im1,jp1,k,0]) % N]) * K
@@ -135,9 +136,10 @@ def metropolis_3dLGT(lt, K, N=2):
                          + new             - lt[i,jm1,kp1,1]) % N]) * K
         
         # debugging
-        if debug == True:
+        if debug:
             print lt
-            print "H_old=", H_old, "H_new=", H_new
+            print "i,j,k,d: ",i,j,k,d
+            print "K=", K, "H_old=", H_old, "H_new=", H_new
             raw_input("press any key to continue...")
 
         # accept or decline
@@ -224,7 +226,7 @@ def metropolis_4dLGT(lt, K, N=2):
                     +Re[(+ lt[i,jm1,k,l,0]   - lt[i,jm1,k,l,1] 
                          + lt[ip1,jm1,k,l,1] - new          ) % N]
                     +Re[(+ lt[i,j,km1,l,2]   - lt[i,j,km1,l,0]   
-                         + new               - lt[ip1,j,km1,l,2]) % N])
+                         + new               - lt[ip1,j,km1,l,2]) % N]
                     +Re[(+ lt[i,j,k,lm1,0]   - lt[i,j,k,lm1,3] 
                          + lt[ip1,j,k,lm1,3] - new          ) % N]) * K
         elif d == 1:
@@ -234,7 +236,7 @@ def metropolis_4dLGT(lt, K, N=2):
                          + lt[ip1,j,k,l,1]   - lt[i,jp1,k,l,0]) % N]
                     +Re[(+ lt[i,j,k,l,3]     - lt[i,j,k,l,1]         # wy
                          + lt[i,j,k,lp1,1]   - lt[i,jp1,k,l,3]) % N]
-                    +Re[(+ lt[i,j,km1,l,0]   - lt[i,j,km1,l,2] 
+                    +Re[(+ lt[i,j,km1,l,1]   - lt[i,j,km1,l,2] 
                          + lt[i,jp1,km1,l,2] - lt[i,j,k,l,1])   % N]
                     +Re[(+ lt[im1,j,k,l,0]   - lt[im1,j,k,l,1]   
                          + lt[i,j,k,l,1]     - lt[im1,jp1,k,l,0]) % N]
@@ -246,10 +248,10 @@ def metropolis_4dLGT(lt, K, N=2):
                          + lt[ip1,j,k,l,1]   - lt[i,jp1,k,l,0]) % N]
                     +Re[(+ lt[i,j,k,l,3]     - new                   # wy
                          + lt[i,j,k,lp1,1]   - lt[i,jp1,k,l,3]) % N]
-                    +Re[(+ lt[i,j,km1,l,0]   - lt[i,j,km1,l,2] 
+                    +Re[(+ lt[i,j,km1,l,1]   - lt[i,j,km1,l,2] 
                          + lt[i,jp1,km1,l,2] - new        )   % N]
                     +Re[(+ lt[im1,j,k,l,0]   - lt[im1,j,k,l,1]   
-                         + new               - lt[im1,jp1,k,l,0]) % N])
+                         + new               - lt[im1,jp1,k,l,0]) % N]
                     +Re[(+ lt[i,j,k,lm1,3]   - lt[i,j,k,lm1,1]       # wy
                          + new               - lt[i,jp1,k,lm1,3]) % N]) * K
         elif d == 2:
@@ -277,7 +279,7 @@ def metropolis_4dLGT(lt, K, N=2):
                          + new               - lt[i,jm1,kp1,l,1]) % N]
                     +Re[(+ lt[i,j,k,lm1,2]   - lt[i,j,k,lm1,3]       # zw 
                          + lt[i,j,kp1,lm1,3] - new            ) % N]) * K
-         elif d == 3:
+        elif d == 3:
             H_old = (Re[(+ lt[i,j,k,l,0]     - lt[i,j,k,l,3]         # xw
                          + lt[ip1,j,k,l,3]   - lt[i,j,k,lp1,0]) % N]
                     +Re[(+ lt[i,j,k,l,3]     - lt[i,j,k,l,1]         # wy
@@ -285,7 +287,7 @@ def metropolis_4dLGT(lt, K, N=2):
                     +Re[(+ lt[i,j,k,l,2]     - lt[i,j,k,l,3]         # zw 
                          + lt[i,j,kp1,l,3]   - lt[i,j,k,lp1,2]) % N]
                     +Re[(+ lt[im1,j,k,l,0]   - lt[im1,j,k,l,3]       # xw
-                         + lt[i,j,k,l,3]     - lt[i,j,k,l,0]) % N]
+                         + lt[i,j,k,l,3]     - lt[im1,j,k,lp1,0]) % N]
                     +Re[(+ lt[i,jm1,k,l,3]   - lt[i,jm1,k,l,1]       # wy
                          + lt[i,jm1,k,lp1,1] - lt[i,j,k,l,3]) % N]
                     +Re[(+ lt[i,j,km1,l,2]   - lt[i,j,km1,l,3]       # zw 
@@ -297,14 +299,14 @@ def metropolis_4dLGT(lt, K, N=2):
                     +Re[(+ lt[i,j,k,l,2]     - new                   # zw 
                          + lt[i,j,kp1,l,3]   - lt[i,j,k,lp1,2]) % N]
                     +Re[(+ lt[im1,j,k,l,0]   - lt[im1,j,k,l,3]       # xw
-                         + new               - lt[i,j,k,l,0]) % N]
+                         + new               - lt[im1,j,k,lp1,0]) % N]
                     +Re[(+ lt[i,jm1,k,l,3]   - lt[i,jm1,k,l,1]       # wy
                          + lt[i,jm1,k,lp1,1] - new            ) % N]
                     +Re[(+ lt[i,j,km1,l,2]   - lt[i,j,km1,l,3]       # zw 
                          + new               - lt[i,j,km1,lp1,2]) % N]) * K
         
         # debugging
-        if debug == True:
+        if debug:
             print lt
             print "H_old=", H_old, "H_new=", H_new
             raw_input("press any key to continue...")
